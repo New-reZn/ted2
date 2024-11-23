@@ -1,11 +1,18 @@
 import { Server } from 'socket.io';
-import {ws as layoutWs} from './src/routes/+layout.server'
+import {data} from './src/routes/ws.store';
 
-function webSocketServer(server) {
-		const io = new Server(server)
-		io.on('connection', (socket) => {
-			layoutWs(socket);
+function webSocketServer(server:unknown) {
+	if(!server){return};
+	const io = new Server(server);
+	console.log("here on",new Date().toLocaleTimeString());		
+	io.on('connection',(socket)=>{
+		data.subscribe((data)=>{
+			console.log(data);
+			if(!data)return;
+			socket.emit('eventFromServer',data);
 		})
+	})
 }
+
 
 export {webSocketServer as ws};
